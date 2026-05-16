@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Client;
+use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,20 +14,33 @@ final class ClientController extends AbstractController
 {
     // LISTE DES CLIENTS --USER CONNECTE----
     #[Route('/api/client', name: 'client_index', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function index(ClientRepository $clientRepository): JsonResponse
     {
     $user = $this->getUser();
 
     if (!$user) {
-        return $this->json(['error' => 'Unauthorized'], 401);
+        return $this->json([
+            'error' => 'Unauthorized'
+        ], 401);
     }
 
-    $clients = $user->getClients();
+    // ADMIN → tous les clients
+    if (in_array('ROLE_ADMIN', $user->getRoles())) {
+        $clients = $clientRepository->findAll();
+    } else {
+        //  USER → uniquement ses clients
+        $clients = $user->getClients();
+    }
 
-    $data = array_map(fn($client) => [
-        'id' => $client->getId(),
-        'name' => $client->getName(),
-    ], $clients->toArray());
+    $data = [];
+
+    foreach ($clients as $client) {
+        $data[] = [
+            'id' => $client->getId(),
+            'name' => $client->getName(),
+            'owner' => $client->getOwner()->getEmail(),
+        ];
+    }
 
     return $this->json($data);
 }
