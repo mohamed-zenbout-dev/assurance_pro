@@ -33,7 +33,7 @@ class ClientVoter extends Voter
         return false;
     }
 
-    // 🔹 Assure-toi d’avoir le vrai User de la base
+    // Assure d’avoir le vrai User de la base
     $realUser = $this->security->getUser(); // récupère le User complet depuis le firewall
 
     if (!$realUser instanceof User) {
