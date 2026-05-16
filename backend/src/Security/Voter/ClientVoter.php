@@ -36,6 +36,11 @@ class ClientVoter extends Voter
         /** @var Client $client */
         $client = $subject;
 
+        // DROIT A L'ADMIN : 
+        if(in_array('ROLE_ADMIN', $user->getRoles())){
+            return true;
+        }
+        // USER NORMAL voit uniquement ses clients :
         return $client->getOwner()->getId() === $user->getId();
     
     }
