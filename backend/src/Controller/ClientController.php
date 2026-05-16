@@ -11,7 +11,28 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ClientController extends AbstractController
 {
-    #[Route('/api/client/{id}', name: 'api_client_show', methods: ['GET'])]
+    // LISTE DES CLIENTS --USER CONNECTE----
+    #[Route('/api/client', name: 'client_index', methods: ['GET'])]
+    public function index(): JsonResponse
+    {
+    $user = $this->getUser();
+
+    if (!$user) {
+        return $this->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $clients = $user->getClients();
+
+    $data = array_map(fn($client) => [
+        'id' => $client->getId(),
+        'name' => $client->getName(),
+    ], $clients->toArray());
+
+    return $this->json($data);
+}
+
+    // VOIR UN CLIENT :
+    #[Route('/api/client/{id}', name: 'client_show', methods: ['GET'])]
     public function show(Client $client): JsonResponse
     {
         $this->denyAccessUnlessGranted('CLIENT_VIEW', $client);
@@ -23,18 +44,14 @@ final class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/api/client', name: 'create_client', methods: ['POST'])]
-    public function create(
-        Request $request,
-        EntityManagerInterface $em
-    ): JsonResponse {
-
+    //: CREER UN CLIENT :
+    #[Route('/api/client', name: 'client_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
         $client = new Client();
         $client->setName($data['name']);
-
-        // owner automatique
         $client->setOwner($this->getUser());
 
         $em->persist($client);
@@ -42,11 +59,40 @@ final class ClientController extends AbstractController
 
         return $this->json([
             'message' => 'Client created',
-            'client' => [
-                'id' => $client->getId(),
-                'name' => $client->getName(),
-                'owner' => $client->getOwner()->getEmail(),
-            ]
+            'id' => $client->getId()
+        ]);
+    }
+
+    // METTRE A JOUR UN CLIENT :
+    #[Route('/api/client/{id}', name: 'client_update', methods: ['PUT'])]
+    public function update(Client $client, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('CLIENT_EDIT', $client);
+
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['name'])) {
+            $client->setName($data['name']);
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Client updated'
+        ]);
+    }
+
+    // SUPPRIMER UN CLIENT :
+    #[Route('/api/client/{id}', name: 'client_delete', methods: ['DELETE'])]
+    public function delete(Client $client, EntityManagerInterface $em): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('CLIENT_DELETE', $client);
+
+        $em->remove($client);
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Client deleted'
         ]);
     }
 }
