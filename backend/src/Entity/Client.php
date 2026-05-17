@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
@@ -14,6 +15,14 @@ class Client
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Le nom du client est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        minMessage : 'Le nom doit contenir au moins {{ limit }} caractères.',
+        max: 255,
+        maxMessage : 'Le nom ne peut pas dépasser {{ limit }} caractères',
+
+    )]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]

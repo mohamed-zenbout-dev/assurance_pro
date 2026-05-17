@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -60,12 +61,26 @@ final class ClientController extends AbstractController
 
     //: CREER UN CLIENT :
     #[Route('/api/client', name: 'client_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         $client = new Client();
         $client->setName($data['name']);
+
+        $errors = $validator->validate($client);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach($errors as $error){
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return $this->json([
+            'errors' => $errorMessages
+            ], 400);
+        }
         $client->setOwner($this->getUser());
 
         $em->persist($client);
@@ -79,7 +94,7 @@ final class ClientController extends AbstractController
 
     // METTRE A JOUR UN CLIENT :
     #[Route('/api/client/{id}', name: 'client_update', methods: ['PUT'])]
-    public function update(Client $client, Request $request, EntityManagerInterface $em): JsonResponse
+    public function update(Client $client, Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
         $this->denyAccessUnlessGranted('CLIENT_EDIT', $client);
 
@@ -89,12 +104,28 @@ final class ClientController extends AbstractController
             $client->setName($data['name']);
         }
 
-        $em->flush();
+        // VALIDATION
+        $errors = $validator->validate($client);
 
-        return $this->json([
-            'message' => 'Client updated'
-        ]);
-    }
+        if (count($errors) > 0) {
+
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return $this->json([
+                'errors' => $errorMessages
+            ], 400);
+        }
+
+    $em->flush();
+
+    return $this->json([
+        'message' => 'Client updated'
+    ]);
+}
 
     // SUPPRIMER UN CLIENT :
     #[Route('/api/client/{id}', name: 'client_delete', methods: ['DELETE'])]
