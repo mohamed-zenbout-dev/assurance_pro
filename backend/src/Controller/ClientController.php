@@ -15,7 +15,7 @@ final class ClientController extends AbstractController
 {
     // LISTE DES CLIENTS --USER CONNECTE----
     #[Route('/api/client', name: 'client_index', methods: ['GET'])]
-    public function index(ClientRepository $clientRepository): JsonResponse
+    public function index( Request $request,ClientRepository $clientRepository): JsonResponse
     {
     $user = $this->getUser();
 
@@ -25,30 +25,47 @@ final class ClientController extends AbstractController
         ], 401);
     }
 
-    // ADMIN → tous les clients
+    // Pagination
+    $page = max(1, $request->query->getInt('page', 1));
+    $limit = max(1, $request->query->getInt('limit', 5));
+
+    $offset = ($page - 1) * $limit;
+
+    // ADMIN peut voir tous les clients
     if (in_array('ROLE_ADMIN', $user->getRoles())) {
-        $clients = $clientRepository->findAll();
-    } else {
-        //  USER → uniquement ses clients
-        $clients = $user->getClients();
-    }
 
-    $data = [];
-
-    foreach ($clients as $client) {
-        $data[] = [
-            'id' => $client->getId(),
-            'name' => $client->getName(),
-            'owner' => $client->getOwner()->getEmail(),
-        ];
-    }
-
-    return $this->json(
-        $client,
-        200,
-        [],
-        ['groups'=>'client:read']
+        $clients = $clientRepository->findBy(
+            [],
+            ['id' => 'DESC'],
+            $limit,
+            $offset
         );
+
+        $total = $clientRepository->count([]);
+
+    } else {
+
+        // USER voit uniquement ses clients
+        $clients = $clientRepository->findBy(
+            ['owner' => $user],
+            ['id' => 'DESC'],
+            $limit,
+            $offset
+        );
+
+        $total = $clientRepository->count([
+            'owner' => $user
+        ]);
+    }
+
+    return $this->json([
+        'page' => $page,
+        'limit' => $limit,
+        'total' => $total,
+        'data' => $clients
+    ], 200, [], [
+        'groups' => 'client:read'
+    ]);
 }
 
     // VOIR UN CLIENT :
