@@ -43,7 +43,12 @@ final class ClientController extends AbstractController
         ];
     }
 
-    return $this->json($data);
+    return $this->json(
+        $client,
+        200,
+        [],
+        ['groups'=>'client:read']
+        );
 }
 
     // VOIR UN CLIENT :
