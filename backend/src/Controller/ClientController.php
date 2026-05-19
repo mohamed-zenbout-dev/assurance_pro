@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\DTO\ClientRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,10 +88,10 @@ final class ClientController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $client = new Client();
-        $client->setName($data['name']);
+        $dto = new ClientRequestDTO();
+        $dto->name = $data['name'] ?? null;
 
-        $errors = $validator->validate($client);
+        $errors = $validator->validate($dto);
 
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -103,6 +104,9 @@ final class ClientController extends AbstractController
             'errors' => $errorMessages
             ], 400);
         }
+
+        $client = new Client();
+        $client->setName($dto->name);
         $client->setOwner($this->getUser());
 
         $em->persist($client);
@@ -122,12 +126,14 @@ final class ClientController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
+        $dto = new ClientRequestDTO();
+        $dto->name = $data['name'] ?? null;
         if (isset($data['name'])) {
             $client->setName($data['name']);
         }
 
         // VALIDATION
-        $errors = $validator->validate($client);
+        $errors = $validator->validate($dto);
 
         if (count($errors) > 0) {
 

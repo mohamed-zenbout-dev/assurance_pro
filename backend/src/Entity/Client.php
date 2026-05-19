@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
-use Symfony\Component\Validator\Constraints as Assert;
+// use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,14 +18,14 @@ class Client
 
     #[ORM\Column(length: 255)]
     #[Groups(['client:read'])]
-    #[Assert\NotBlank(message:'Le nom du client est obligatoire.')]
-    #[Assert\Length(
-        min: 2,
-        minMessage : 'Le nom doit contenir au moins {{ limit }} caractères.',
-        max: 255,
-        maxMessage : 'Le nom ne peut pas dépasser {{ limit }} caractères',
+    // #[Assert\NotBlank(message:'Le nom du client est obligatoire.')]
+    // #[Assert\Length(
+    //     min: 2,
+    //     minMessage : 'Le nom doit contenir au moins {{ limit }} caractères.',
+    //     max: 255,
+    //     maxMessage : 'Le nom ne peut pas dépasser {{ limit }} caractères',
 
-    )]
+    // )]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
