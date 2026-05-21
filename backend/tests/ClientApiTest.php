@@ -39,4 +39,18 @@ class ClientApiTest extends WebTestCase{
 
         $this->assertResponseIsSuccessful();
     }
+
+    public function testCreateClient(): void{
+        
+    $client = static::createClient();
+    $token = $this->getJwtToken($client);
+
+    $client->request('POST','/api/client',[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $token],json_encode(['name' => 'Client PHPUnit']));
+
+    $this->assertResponseStatusCodeSame(200);
+
+    $data = json_decode($client->getResponse()->getContent(),true);
+
+    $this->assertEquals('Client created',$data['message']);
+    }
 }
