@@ -12,7 +12,7 @@ class ClientApiTest extends WebTestCase{
         $this->assertResponseStatusCodeSame(401);
     }
 
-    
+
 
     public function TestLoginSuccess(): void {
         $client = static::createClient();
@@ -86,5 +86,25 @@ class ClientApiTest extends WebTestCase{
     $updatedData = json_decode($client->getResponse()->getContent(),true);
 
     $this->assertEquals('Client updated',$updatedData['message']);
+    }
+
+
+    public function testDeleteClient(): void{
+    
+    $client = static::createClient();
+    $token = $this->getJwtToken($client);
+    $client->request('POST','/api/client',[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $token],json_encode(['name' => 'Client Delete PHPUnit']));
+
+    $data = json_decode($client->getResponse()->getContent(),true);
+
+    $clientId = $data['id'];
+
+    $client->request('DELETE','/api/client/' . $clientId,[],[],['HTTP_Authorization' => 'Bearer ' . $token]);
+
+    $this->assertResponseIsSuccessful();
+
+    $deletedData = json_decode($client->getResponse()->getContent(),true);
+
+    $this->assertEquals('Client deleted',$deletedData['message']);
     }
 }
