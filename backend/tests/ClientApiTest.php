@@ -12,6 +12,8 @@ class ClientApiTest extends WebTestCase{
         $this->assertResponseStatusCodeSame(401);
     }
 
+    
+
     public function TestLoginSuccess(): void {
         $client = static::createClient();
 
@@ -22,6 +24,8 @@ class ClientApiTest extends WebTestCase{
         $this->assertArrayHasKey('token', $data);
     }
 
+
+
     public function getJwtToken($client): string {
 
         $client->request('POST','/api/login_check', [],[],['CONTENT_TYPE' => 'application/json'], json_encode(['email' => 'test@test.com', 'password' => '123456']));
@@ -30,6 +34,10 @@ class ClientApiTest extends WebTestCase{
         $data = json_decode($client->getResponse()->getContent(), true);
         return $data['token'];
     }
+
+
+
+
 
     public function testGetClients(): void {
         $client = static::createClient();
@@ -40,8 +48,12 @@ class ClientApiTest extends WebTestCase{
         $this->assertResponseIsSuccessful();
     }
 
+
+
+
+
     public function testCreateClient(): void{
-        
+
     $client = static::createClient();
     $token = $this->getJwtToken($client);
 
@@ -52,5 +64,27 @@ class ClientApiTest extends WebTestCase{
     $data = json_decode($client->getResponse()->getContent(),true);
 
     $this->assertEquals('Client created',$data['message']);
+    }
+
+
+
+
+    public function testUpdateClient(): void{
+
+    $client = static::createClient();
+    $token = $this->getJwtToken($client);
+
+    $client->request('POST','/api/client',[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $token],json_encode(['name' => 'Client Avant Update']));
+
+    $data = json_decode($client->getResponse()->getContent(),true);
+
+    $clientId = $data['id'];   
+    $client->request('PUT','/api/client/' . $clientId,[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $token],json_encode(['name' => 'Client Modifié PHPUnit']));
+
+    $this->assertResponseIsSuccessful();
+
+    $updatedData = json_decode($client->getResponse()->getContent(),true);
+
+    $this->assertEquals('Client updated',$updatedData['message']);
     }
 }
