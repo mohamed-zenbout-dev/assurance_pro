@@ -154,4 +154,29 @@ class ClientApiTest extends WebTestCase{
 
     $this->assertResponseStatusCodeSame(403);
     }
+
+
+    public function testAdminCanEditAllClients(): void{
+    $client = static::createClient();
+    // USER 1 crée client
+    $tokenUser1 = $this->getJwtToken($client);
+    $client->request('POST','/api/client',[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $tokenUser1],
+        json_encode(['name' => 'Client User1']));
+
+    $data = json_decode($client->getResponse()->getContent(),true);
+
+    $clientId = $data['id'];
+
+    // ADMIN TOKEN
+    $adminToken = $this->getAdminJwtToken($client);
+    // ADMIN modifie client USER1
+    $client->request('PUT','/api/client/' . $clientId,[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $adminToken],
+        json_encode(['name' => 'Admin Updated Client']));
+
+    $this->assertResponseIsSuccessful();
+
+    $updatedData = json_decode($client->getResponse()->getContent(),true);
+
+    $this->assertEquals('Client updated',$updatedData['message']);
+    }
 }
