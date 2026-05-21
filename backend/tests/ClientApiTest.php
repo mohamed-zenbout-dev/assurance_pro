@@ -35,6 +35,30 @@ class ClientApiTest extends WebTestCase{
         return $data['token'];
     }
 
+    public function getUser2JwtToken($client): string{
+        $client->request('POST','/api/login_check',[],[],['CONTENT_TYPE' => 'application/json'],
+            json_encode(['email' => 'test2@test.com','password' => '123456']));
+
+        $data = json_decode($client->getResponse()->getContent(),true);
+
+        return $data['token'];
+    }
+
+    public function getAdminJwtToken($client): string {
+        $client->request('POST','/api/login_check',[],[],['CONTENT_TYPE' => 'application/json'],json_encode(['email' => 'admin@admin.com','password' => '123456']));
+
+        $data = json_decode($client->getResponse()->getContent(),true);
+        return $data['token'];
+    }
+
+    public function testAdminCanAccessAllClients(): void{
+        $client = static::createClient();
+        $token = $this->getAdminJwtToken($client);
+
+        $client->request('GET','/api/client',[],[],['HTTP_Authorization' => 'Bearer ' . $token]);
+        $this->assertResponseIsSuccessful();
+}
+
 
 
 
@@ -106,5 +130,28 @@ class ClientApiTest extends WebTestCase{
     $deletedData = json_decode($client->getResponse()->getContent(),true);
 
     $this->assertEquals('Client deleted',$deletedData['message']);
+    }
+
+
+
+    public function testUserCannotEditAnotherUserClient(): void{
+    $client = static::createClient();
+    // USER 1 TOKEN
+    $tokenUser1 = $this->getJwtToken($client);
+
+    // USER 1 crée client
+    $client->request('POST','/api/client',[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $tokenUser1],
+        json_encode(['name' => 'Client User1']));
+    $data = json_decode($client->getResponse()->getContent(),true);
+
+    $clientId = $data['id'];
+
+    // USER 2 TOKEN
+    $tokenUser2 = $this->getUser2JwtToken($client);
+    // USER 2 tente modification
+    $client->request('PUT','/api/client/' . $clientId,[],[],['CONTENT_TYPE' => 'application/json','HTTP_Authorization' => 'Bearer ' . $tokenUser2],
+        json_encode(['name' => 'Hack Client']));
+
+    $this->assertResponseStatusCodeSame(403);
     }
 }
