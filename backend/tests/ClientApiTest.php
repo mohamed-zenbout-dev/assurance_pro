@@ -15,10 +15,28 @@ class ClientApiTest extends WebTestCase{
     public function TestLoginSuccess(): void {
         $client = static::createClient();
 
-        $client->request('POST','/api/login_check', [],[],['Content-Type' => 'application/json'], json_encode(['email' => 'test@test.com', 'password' => '123456']));
+        $client->request('POST','/api/login_check', [],[],['CONTENT_TYPE' => 'application/json'], json_encode(['email' => 'test@test.com', 'password' => '123456']));
         $this->assertResponseIsSuccessful();
 
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('token', $data);
+    }
+
+    public function getJwtToken($client): string {
+
+        $client->request('POST','/api/login_check', [],[],['CONTENT_TYPE' => 'application/json'], json_encode(['email' => 'test@test.com', 'password' => '123456']));
+        $this->assertResponseIsSuccessful();
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+        return $data['token'];
+    }
+
+    public function testGetClients(): void {
+        $client = static::createClient();
+        $token = $this->getJwtToken($client);
+
+        $client->request('GET', '/api/client', [], [], ['HTTP_Authorization' => 'Bearer ' . $token]);
+
+        $this->assertResponseIsSuccessful();
     }
 }
