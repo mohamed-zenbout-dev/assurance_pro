@@ -5,12 +5,9 @@ on:
   pull_request:
 
 jobs:
-  phpunit:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout project
-        uses: actions/checkout@v4
-
       - name: Test
         run: echo "GitHub Actions works"
