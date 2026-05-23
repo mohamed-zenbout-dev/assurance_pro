@@ -43,5 +43,8 @@ jobs:
         run: |
           echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/assurance_pro_test?serverVersion=8.0.32&charset=utf8mb4" > .env.test.local
 
-      - name: Symfony Check
+      - name: Create database
         run: php bin/console doctrine:database:create --env=test
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
