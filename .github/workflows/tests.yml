@@ -8,6 +8,20 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: assurance_pro_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     defaults:
       run:
         working-directory: backend
@@ -25,5 +39,9 @@ jobs:
       - name: Install Composer dependencies
         run: composer install
 
+      - name: Create .env.test.local
+        run: |
+          echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/assurance_pro_test?serverVersion=8.0.32&charset=utf8mb4" > .env.test.local
+
       - name: Symfony Check
-        run: php bin/console --version
+        run: php bin/console doctrine:database:create --env=test
