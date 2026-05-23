@@ -5,9 +5,17 @@ on:
   pull_request:
 
 jobs:
-  test:
+  phpunit:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test
-        run: echo "GitHub Actions works"
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+
+      - name: Check PHP Version
+        run: php -v
