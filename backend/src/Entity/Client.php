@@ -47,10 +47,17 @@ class Client
     #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'client')]
     private Collection $quotes;
 
+    /**
+     * @var Collection<int, Claim>
+     */
+    #[ORM\OneToMany(targetEntity: Claim::class, mappedBy: 'client')]
+    private Collection $claims;
+
     public function __construct()
     {
         $this->contracts = new ArrayCollection();
         $this->quotes = new ArrayCollection();
+        $this->claims = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,6 +143,36 @@ class Client
             // set the owning side to null (unless already changed)
             if ($quote->getClient() === $this) {
                 $quote->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Claim>
+     */
+    public function getClaims(): Collection
+    {
+        return $this->claims;
+    }
+
+    public function addClaim(Claim $claim): static
+    {
+        if (!$this->claims->contains($claim)) {
+            $this->claims->add($claim);
+            $claim->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClaim(Claim $claim): static
+    {
+        if ($this->claims->removeElement($claim)) {
+            // set the owning side to null (unless already changed)
+            if ($claim->getClient() === $this) {
+                $claim->setClient(null);
             }
         }
 
