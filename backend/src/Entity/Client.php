@@ -10,26 +10,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
+
+// Représente un client de l'application Assurance Pro.
+// Un client est rattaché à un utilisateur et peut posséder plusieurs contrats, devis et sinistres.
 class Client
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    // Identifiant unique du client.
     #[ORM\Column]
     #[Groups(['client:read'])]
     private ?int $id = null;
 
+
+    // Nom complet du client.
     #[ORM\Column(length: 255)]
     #[Groups(['client:read'])]
-    // #[Assert\NotBlank(message:'Le nom du client est obligatoire.')]
-    // #[Assert\Length(
-    //     min: 2,
-    //     minMessage : 'Le nom doit contenir au moins {{ limit }} caractères.',
-    //     max: 255,
-    //     maxMessage : 'Le nom ne peut pas dépasser {{ limit }} caractères',
-
-    // )]
     private ?string $name = null;
 
+    // Utilisateur responsable de ce client.
+    //  Relation ManyToOne : plusieurs clients peuvent appartenir au même utilisateur.
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['client:read'])]
@@ -38,18 +38,21 @@ class Client
     /**
      * @var Collection<int, Contract>
      */
+    // Ensemble des contrats appartenant au client.
     #[ORM\OneToMany(targetEntity: Contract::class, mappedBy: 'client')]
     private Collection $contracts;
 
     /**
      * @var Collection<int, Quote>
      */
+    // Ensemble des devis associés au client.
     #[ORM\OneToMany(targetEntity: Quote::class, mappedBy: 'client')]
     private Collection $quotes;
 
     /**
      * @var Collection<int, Claim>
      */
+    // Ensemble des sinistres déclarés par le client.
     #[ORM\OneToMany(targetEntity: Claim::class, mappedBy: 'client')]
     private Collection $claims;
 

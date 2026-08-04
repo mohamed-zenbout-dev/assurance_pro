@@ -8,46 +8,64 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClaimRepository::class)]
+
+ 
 class Claim
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    // Identifiant unique d'un sinistre.
     #[ORM\Column]
     #[Groups(['claim:read'])]
     private ?int $id = null;
 
+    // Numéro unique du sinistre.
+    // Il permet d'identifier chaque déclaration de sinistre.
     #[ORM\Column(length: 100, unique: true)]
     #[Groups(['claim:read'])]
     private ?string $claimNumber = null;
 
+    // Type de sinistre déclaré.
+    //Ex : Accident automobile, Dégât des eaux, Incendie, Vol.
     #[ORM\Column(length: 100)]
     #[Groups(['claim:read'])]
     private ?string $incidentType = null;
 
+    // Description détaillée du sinistre.
+    // Ce champ permet au client de décrire précisément les circonstances de l'incident.
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['claim:read'])]
     private ?string $description = null;
 
+    // Date à laquelle le sinistre est survenu.
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $incidentDate = null;
 
+    // État d'avancement du sinistre.
+    // Ex : Déclaré, En cours d'analyse, Accepté, Refusé, Clôturé
     #[ORM\Column(length: 50)]
     #[Groups(['claim:read'])]
     private ?string $status = null;
 
+    // Estimation financière des dommages déclarés.
+    // Cette valeur permet d'évaluer le montant potentiel de l'indemnisation.
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Groups(['claim:read'])]
     private ?string $estimatedDamage = null;
 
+    // Date de création de la déclaration de sinistre.
     #[ORM\Column]
     #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    // Date de la dernière mise à jour du sinistre.
     #[ORM\Column]
     #[Groups(['claim:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    // Client ayant déclaré le sinistre.
+    //  Relation ManyToOne : plusieurs sinistres peuvent être associés à un même client.
     #[ORM\ManyToOne(inversedBy: 'claims')]
     #[Groups(['claim:read'])]
     #[ORM\JoinColumn(nullable: false)]

@@ -33,6 +33,7 @@ security:
             stateless: true
             json_login:
                 check_path: /api/login_check
+                login_path: /api/login_check
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -43,6 +44,9 @@ security:
     - { path: ^/api/register, roles: PUBLIC_ACCESS }
     - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
     - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
+
+    - { path: ^/api/forgot-password, roles: PUBLIC_ACCESS }
+    - { path: ^/api/reset-password, roles: PUBLIC_ACCESS }
 
     - { path: ^/api/doc, roles: PUBLIC_ACCESS }
     - { path: ^/api/doc.json, roles: PUBLIC_ACCESS }

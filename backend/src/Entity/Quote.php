@@ -8,38 +8,55 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuoteRepository::class)]
+//  Représente un devis d'assurance.
+//  Cette entité permet d'enregistrer les demandes de devis effectuées par un client avant la souscription d'un contrat d'assurance.
+//  Chaque devis est associé à un seul client et contient les informations nécessaires à l'estimation du coût de l'assurance.
 class Quote
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    // Identifiant unique du devis.
     #[ORM\Column]
     #[Groups(['quote:read'])]
     private ?int $id = null;
 
+    // Numéro unique du devis.
+    // Ce numéro permet d'identifier chaque devis de manière unique.
     #[ORM\Column(length: 100, unique: true)]
     #[Groups(['quote:read'])]
     private ?string $quoteNumber = null;
 
+    // Type d'assurance demandé.
+    // Automobile, Habitation, Santé 
     #[ORM\Column(length: 100)]
     #[Groups(['quote:read'])]
     private ?string $insuranceType = null;
 
+    // Montant estimé du devis.
+    // Correspond au coût estimatif calculé avant la création éventuelle d'un contrat d'assurance.
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Groups(['quote:read'])]
     private ?string $estimatedAmount = null;
 
+    // État actuel du devis.
+    // Exemple : En attente, Accepté, Refusé, Expiré
     #[ORM\Column(length: 50)]
     #[Groups(['quote:read'])]
     private ?string $status = null;
 
+    // Date de création du devis.
     #[ORM\Column]
     #[Groups(['quote:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    // Date de la dernière mise à jour du devis.
     #[ORM\Column]
     #[Groups(['quote:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    // Client ayant effectué la demande de devis.
+    // Un sinistre est obligatoirement associé à un client.
+    // Cette entité permet de stocker les informations relatives à un incident déclaré auprès de l'assurance afin d'en assurer le suivi jusqu'à sa clôture.
     #[ORM\ManyToOne(inversedBy: 'quotes')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['quote:read'])]

@@ -12,11 +12,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
+// Contrôleur permettant la gestion des clients.
+// Ce contrôleur expose les différentes routes REST permettant de créer, consulter, modifier et supprimer des clients.
+// Les accès sont sécurisés grâce au système d'authentification Symfony ainsi qu'aux Voters permettant de contrôler les droits d'accès sur chaque ressource.
+
 final class ClientController extends AbstractController
 {
-    // LISTE DES CLIENTS --USER CONNECTE----
+    // la méthode index retourne la liste des clients.
+    // Fonctionnement :
+    // Vérifie que l'utilisateur est authentifié.
+    // Si l'utilisateur possède le rôle ROLE_ADMIN,   tous les clients sont retournés.
+    // Sinon, seuls les clients appartenant à l'utilisateur connecté sont récupérés.
+    // Les résultats sont paginés.
     #[Route('/api/client', name: 'client_index', methods: ['GET'])]
-    public function index( Request $request,ClientRepository $clientRepository): JsonResponse
+    public function index( 
+        Request $request, // Contient les paramètres de pagination.
+        ClientRepository $clientRepository // Repository Doctrine des clients.
+    ): JsonResponse // Retourne la liste paginée des clients
     {
     $user = $this->getUser();
 
@@ -72,6 +84,9 @@ final class ClientController extends AbstractController
     // VOIR UN CLIENT :
     #[Route('/api/client/{id}', name: 'client_show', methods: ['GET'])]
     public function show(Client $client): JsonResponse
+    // Fonctionnement :
+    // Vérifie les autorisations grâce au Voter CLIENT_VIEW.
+    // Retourne les informations principales du client.
     {
         $this->denyAccessUnlessGranted('CLIENT_VIEW', $client);
 
@@ -82,10 +97,15 @@ final class ClientController extends AbstractController
         ]);
     }
 
-    //: CREER UN CLIENT :
+    // CREER UN NOUVEAU CLIENT :
     #[Route('/api/client', name: 'client_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
+        // Récupère les données JSON.
+        // Hydrate un DTO.
+        // Valide les données.
+        // Associe automatiquement le client à l'utilisateur connecté.
+        // Enregistre le client dans la base.
         $data = json_decode($request->getContent(), true);
 
         $dto = new ClientRequestDTO();
@@ -122,6 +142,10 @@ final class ClientController extends AbstractController
     #[Route('/api/client/{id}', name: 'client_update', methods: ['PUT'])]
     public function update(Client $client, Request $request, EntityManagerInterface $em, ValidatorInterface $validator): JsonResponse
     {
+        // Vérifie les autorisations via le Voter CLIENT_EDIT.
+        // Valide les nouvelles données.
+        // Met à jour les informations du client.
+        // Sauvegarde les modifications.
         $this->denyAccessUnlessGranted('CLIENT_EDIT', $client);
 
         $data = json_decode($request->getContent(), true);
@@ -159,6 +183,9 @@ final class ClientController extends AbstractController
     #[Route('/api/client/{id}', name: 'client_delete', methods: ['DELETE'])]
     public function delete(Client $client, EntityManagerInterface $em): JsonResponse
     {
+    // Vérifie les autorisations via le Voter CLIENT_DELETE.
+    // Supprime définitivement le client de la base.
+ 
         $this->denyAccessUnlessGranted('CLIENT_DELETE', $client);
 
         $em->remove($client);

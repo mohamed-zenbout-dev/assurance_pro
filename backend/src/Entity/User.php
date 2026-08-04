@@ -15,11 +15,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    //  Identifiant unique de l'utilisateur.
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    // Adresse e-mail de l'utilisateur.
+    // Cette valeur est unique et sert également d'identifiant de connexion.
     #[ORM\Column(length: 180)]
     #[Groups(['client:read'])]
     private ?string $email = null;
