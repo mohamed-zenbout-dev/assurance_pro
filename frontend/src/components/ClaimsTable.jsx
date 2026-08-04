@@ -1,35 +1,34 @@
+import { Eye } from 'lucide-react';
+
 function ClaimsTable({ claims }) {
-  const getStatusClass = (status) => {
+  const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
       case 'accepté':
       case 'accepte':
       case 'validé':
       case 'valide':
         return 'bg-green-100 text-green-700';
+
       case 'refusé':
       case 'refuse':
         return 'bg-red-100 text-red-700';
+
       default:
         return 'bg-yellow-100 text-yellow-700';
     }
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-900">
-          Mes Sinistres
-        </h2>
-      </div>
-
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
             <tr>
-              <th className="px-4 py-3 font-medium">Sinistre</th>
-              <th className="px-4 py-3 font-medium">Type</th>
-              <th className="px-4 py-3 font-medium">Date</th>
+              <th className="px-4 py-3 font-medium">Description</th>
+              <th className="px-4 py-3 font-medium">Date du sinistre</th>
               <th className="px-4 py-3 font-medium">Statut</th>
+              <th className="px-4 py-3 font-medium">Dernière mise à jour</th>
+              <th className="px-4 py-3 font-medium text-center">Action</th>
             </tr>
           </thead>
 
@@ -38,11 +37,7 @@ function ClaimsTable({ claims }) {
               claims.map((claim) => (
                 <tr key={claim.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">
-                    {claim.title || claim.description || 'Sinistre'}
-                  </td>
-
-                  <td className="px-4 py-3 text-slate-600">
-                    {claim.type || 'Assurance'}
+                    {claim.description || claim.title || 'Sinistre'}
                   </td>
 
                   <td className="px-4 py-3 text-slate-600">
@@ -53,29 +48,43 @@ function ClaimsTable({ claims }) {
 
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusClass(
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusBadge(
                         claim.status
                       )}` }
                     >
                       {claim.status || 'En attente'}
                     </span>
                   </td>
+
+                  <td className="px-4 py-3 text-slate-600">
+                    {claim.updatedAt
+                      ? new Date(claim.updatedAt).toLocaleDateString('fr-FR')
+                      : claim.createdAt
+                      ? new Date(claim.createdAt).toLocaleDateString('fr-FR')
+                      : '—'}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    <button className="rounded-full border border-violet-200 p-2 text-violet-600 transition hover:bg-violet-50 hover:text-violet-700">
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="4"
-                  className="px-4 py-8 text-center text-slate-500"
+                  colSpan="5"
+                  className="px-4 py-10 text-center text-slate-500"
                 >
-                  Aucun sinistre déclaré pour le moment.
+                  Aucun sinistre trouvé.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
 }
 
