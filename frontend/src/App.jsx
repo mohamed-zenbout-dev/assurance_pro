@@ -7,6 +7,7 @@ import Contracts from './pages/Contracts';
 import Quotes from './pages/Quotes';
 import Claims from './pages/Claims';
 import Profile from './pages/Profile';
+import DashboardAdmin from './pages/DashboardAdmin';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -17,6 +18,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />}/>
 
+        <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        {/* ROUTES PROTEGE PARTIE CLIENT */}
         <Route
           path="/dashboard"
           element={
@@ -57,6 +61,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        {/* ROUTES PROTEGE PARTIE ADMINISTRATEUR */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute adminOnly>
+              <DashboardAdmin />
             </ProtectedRoute>
           }
         />

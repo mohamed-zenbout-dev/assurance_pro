@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
 import Navbar from '../components/Navbar';
@@ -44,14 +45,22 @@ function Login() {
         }
       );
 
-      console.log('Réponse :', response.data);
+      console.log('Réponse login :', response.data);
 
-      // Stockage du token JWT
       localStorage.setItem('token', response.data.token);
 
-      // Redirection vers le dashboard protégé
-      navigate('/dashboard');
-    } catch (error) {
+      // décodage du JWT
+      const decoded = jwtDecode(response.data.token);
+      const roles = decoded.roles || [];
+
+      localStorage.setItem('roles', JSON.stringify(roles));
+
+      if (roles.includes('ROLE_ADMIN')) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+      } catch (error) {
       console.error('Erreur complète :', error);
       console.error('Réponse serveur :', error.response?.data);
 
