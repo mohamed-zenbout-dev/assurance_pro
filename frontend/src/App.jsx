@@ -6,6 +6,7 @@ import DashboardClient from './pages/DashboardClient';
 import Contracts from './pages/Contracts';
 import Quotes from './pages/Quotes';
 import Claims from './pages/Claims';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -48,6 +49,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Claims />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
