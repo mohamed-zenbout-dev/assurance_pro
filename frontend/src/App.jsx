@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from "./pages/Register";
 import DashboardClient from './pages/DashboardClient';
 import Contracts from './pages/Contracts';
+import Quotes from './pages/Quotes';
 import Claims from './pages/Claims';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -29,6 +30,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Contracts />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/quotes"
+          element={
+            <ProtectedRoute>
+              <Quotes />
             </ProtectedRoute>
           }
         />
