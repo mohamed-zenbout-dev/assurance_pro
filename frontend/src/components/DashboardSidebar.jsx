@@ -10,7 +10,7 @@ function DashboardSidebar() {
   };
 
   return (
-    <aside className="flex min-h-screen w-full flex-col bg-gradient-to-b from-violet-700 to-purple-700 text-white lg:w-72">
+    <aside className="flex w-full flex-col bg-gradient-to-b from-violet-700 to-purple-700 text-white lg:sticky lg:top-0 lg:min-h-screen lg:w-72 lg:self-stretch">
       {/* Logo */}
       <div className="border-b border-white/10 px-6 py-8">
         <Link to="/dashboard" className="flex items-center gap-3">

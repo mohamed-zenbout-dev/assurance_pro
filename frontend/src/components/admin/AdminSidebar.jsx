@@ -17,7 +17,7 @@ function AdminSidebar() {
     }`;
 
   return (
-    <aside className="flex h-full min-h-screen flex-col bg-gradient-to-b from-violet-700 to-violet-800 p-6 text-white">
+    <aside className="flex w-full flex-col bg-gradient-to-b from-violet-700 to-purple-700 text-white lg:sticky lg:top-0 lg:min-h-screen lg:w-72 lg:self-stretch">
       <div className="mb-10 flex items-center gap-3">
         <div className="rounded-2xl bg-white/10 p-2">
           <ShieldCheck className="h-7 w-7" />

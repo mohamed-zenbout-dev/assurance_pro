@@ -8,6 +8,8 @@ import Quotes from './pages/Quotes';
 import Claims from './pages/Claims';
 import Profile from './pages/Profile';
 import DashboardAdmin from './pages/DashboardAdmin';
+import AdminUsers from './pages/AdminUsers';
+import AdminProfile from './pages/AdminProfile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -73,6 +75,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminProfile />
+          </ProtectedRoute>
+        }
+      />
       </Routes>
     </BrowserRouter>
   );
