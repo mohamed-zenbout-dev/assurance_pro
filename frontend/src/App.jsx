@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import DashboardAdmin from './pages/DashboardAdmin';
 import AdminUsers from './pages/AdminUsers';
 import AdminProfile from './pages/AdminProfile';
+import AdminContracts from './pages/AdminContracts';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -88,6 +89,14 @@ function App() {
         element={
           <ProtectedRoute adminOnly>
             <AdminProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/contracts"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminContracts />
           </ProtectedRoute>
         }
       />
