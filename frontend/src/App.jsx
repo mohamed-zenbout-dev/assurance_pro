@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Offers from './pages/Offers';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from "./pages/Register";
 import DashboardClient from './pages/DashboardClient';
@@ -21,11 +22,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/offers" element={<Offers />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />}/>
-
-        <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         {/* ROUTES PROTEGE PARTIE CLIENT */}
         <Route
           path="/dashboard"
