@@ -8,6 +8,7 @@ import DashboardHeader from '../components/DashboardHeader';
 import ClaimForm from '../components/ClaimForm';
 import ClaimsToolbar from '../components/ClaimsToolbar';
 import ClaimsTable from '../components/ClaimsTable';
+import PageLoader from '../components/common/PageLoader';
 
 function Claims() {
   const [client, setClient] = useState(null);
@@ -26,9 +27,16 @@ function Claims() {
         ]);
 
         setClient(clientRes.data);
-        setClaims(claimsRes.data || []);
+
+        const data = Array.isArray(claimsRes.data)
+          ? claimsRes.data
+          : claimsRes.data.claims ||
+            claimsRes.data['hydra:member'] ||
+            [];
+
+        setClaims(data);
       } catch (error) {
-        console.error(error);
+        console.error('Erreur chargement sinistres :', error);
       } finally {
         setLoading(false);
       }
@@ -66,51 +74,49 @@ function Claims() {
     });
   }, [claims, search, statusFilter]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
-      <div className="lg:w-72 lg:flex-shrink-0">
+      <div className="lg:w-72 lg:flex-shrink-0 lg:self-stretch">
         <DashboardSidebar />
       </div>
 
-      <main className="flex-1 p-6 lg:p-8">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <DashboardHeader client={client} />
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
-            <FileWarning className="h-7 w-7" />
-          </div>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <>
+            <div className="mb-8 flex items-center gap-3">
+              <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
+                <FileWarning className="h-7 w-7" />
+              </div>
 
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Mes Sinistres
-            </h1>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  Mes Sinistres
+                </h1>
 
-            <p className="mt-1 text-slate-600">
-              Déclarez un sinistre et suivez l'état de vos déclarations.
-            </p>
-          </div>
-        </div>
+                <p className="mt-1 text-slate-600">
+                  Déclarez un sinistre et suivez l’état de vos déclarations.
+                </p>
+              </div>
+            </div>
 
-        <ClaimForm onClaimCreated={handleClaimCreated} />
+            <ClaimForm onClaimCreated={handleClaimCreated} />
 
-        <div className="mt-8">
-          <ClaimsToolbar
-            search={search}
-            setSearch={setSearch}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-          />
+            <div className="mt-8">
+              <ClaimsToolbar
+                search={search}
+                setSearch={setSearch}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
 
-          <ClaimsTable claims={filteredClaims} />
-        </div>
+              <ClaimsTable claims={filteredClaims} />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

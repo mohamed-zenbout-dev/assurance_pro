@@ -8,6 +8,7 @@ import DashboardHeader from '../components/DashboardHeader';
 import QuoteForm from '../components/QuoteForm';
 import QuotesToolbar from '../components/QuotesToolbar';
 import QuotesTable from '../components/QuotesTable';
+import PageLoader from '../components/common/PageLoader';
 
 function Quotes() {
   const [client, setClient] = useState(null);
@@ -26,9 +27,16 @@ function Quotes() {
         ]);
 
         setClient(clientRes.data);
-        setQuotes(quotesRes.data || []);
+
+        const data = Array.isArray(quotesRes.data)
+          ? quotesRes.data
+          : quotesRes.data.quotes ||
+            quotesRes.data['hydra:member'] ||
+            [];
+
+        setQuotes(data);
       } catch (error) {
-        console.error(error);
+        console.error('Erreur chargement devis :', error);
       } finally {
         setLoading(false);
       }
@@ -37,17 +45,14 @@ function Quotes() {
     fetchData();
   }, []);
 
-  const handleQuoteCreated = async ({ insuranceType, description, startDate }) => {
-    const payload = {
-      type_assurance: insuranceType,
-      description,
-      date_debut_souhaitee: startDate,
-      statut: 'En attente',
-    };
+  const handleQuoteCreated = async (payload) => {
+    try {
+      const response = await api.post('/quotes', payload);
 
-    const response = await api.post('/quotes', payload);
-
-    setQuotes((prev) => [response.data, ...prev]);
+      setQuotes((prev) => [response.data, ...prev]);
+    } catch (error) {
+      console.error('Erreur création devis :', error);
+    }
   };
 
   const filteredQuotes = useMemo(() => {
@@ -68,51 +73,49 @@ function Quotes() {
     });
   }, [quotes, search, statusFilter]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
-      <div className="lg:w-72 lg:flex-shrink-0">
+      <div className="lg:w-72 lg:flex-shrink-0 lg:self-stretch">
         <DashboardSidebar />
       </div>
 
-      <main className="flex-1 p-6 lg:p-8">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <DashboardHeader client={client} />
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
-            <FileText className="h-7 w-7" />
-          </div>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <>
+            <div className="mb-8 flex items-center gap-3">
+              <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
+                <FileText className="h-7 w-7" />
+              </div>
 
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Mes Devis
-            </h1>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  Mes Devis
+                </h1>
 
-            <p className="mt-1 text-slate-600">
-              Demandez un devis et consultez les réponses reçues.
-            </p>
-          </div>
-        </div>
+                <p className="mt-1 text-slate-600">
+                  Demandez un devis et suivez son état d’avancement.
+                </p>
+              </div>
+            </div>
 
-        <QuoteForm onQuoteCreated={handleQuoteCreated} />
+            <QuoteForm onQuoteCreated={handleQuoteCreated} />
 
-        <div className="mt-8">
-          <QuotesToolbar
-            search={search}
-            setSearch={setSearch}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-          />
+            <div className="mt-8">
+              <QuotesToolbar
+                search={search}
+                setSearch={setSearch}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
 
-          <QuotesTable quotes={filteredQuotes} />
-        </div>
+              <QuotesTable quotes={filteredQuotes} />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
