@@ -11,6 +11,7 @@ import DashboardAdmin from './pages/DashboardAdmin';
 import AdminUsers from './pages/AdminUsers';
 import AdminProfile from './pages/AdminProfile';
 import AdminContracts from './pages/AdminContracts';
+import AdminClaims from './pages/AdminClaims';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -97,6 +98,14 @@ function App() {
         element={
           <ProtectedRoute adminOnly>
             <AdminContracts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/claims"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminClaims />
           </ProtectedRoute>
         }
       />
