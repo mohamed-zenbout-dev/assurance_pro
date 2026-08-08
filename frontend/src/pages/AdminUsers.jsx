@@ -1,26 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Search, Shield, Users } from 'lucide-react';
+import { Users, Search } from 'lucide-react';
 
 import api from '../services/api';
 
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
-import AdminStatsCard from '../components/admin/AdminStatsCard';
-import AdminUsersTable from '../components/admin/AdminUsersTable';
+import PageLoader from '../components/common/PageLoader';
 
 function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await api.get('/admin/users');
-        setUsers(response.data || []);
+
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.users || response.data['hydra:member'] || [];
+
+        setUsers(data);
       } catch (error) {
-        console.error(error);
+        console.error('Erreur chargement utilisateurs :', error);
       } finally {
         setLoading(false);
       }
@@ -30,71 +33,43 @@ function AdminUsers() {
   }, []);
 
   const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const email = user.email?.toLowerCase() || '';
-      const matchesSearch = email.includes(search.toLowerCase().trim());
-
-      const matchesRole =
-        roleFilter === 'all' ||
-        user.roles?.includes(roleFilter);
-
-      return matchesSearch && matchesRole;
-    });
-  }, [users, search, roleFilter]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
-      </div>
+    return users.filter((user) =>
+      user.email?.toLowerCase().includes(search.toLowerCase()) ||
+      user.nom?.toLowerCase().includes(search.toLowerCase()) ||
+      user.prenom?.toLowerCase().includes(search.toLowerCase())
     );
-  }
-
-  const totalUsers = users.length;
-  const totalClients = users.filter((u) =>
-    u.roles?.includes('ROLE_USER') && !u.roles?.includes('ROLE_ADMIN')
-  ).length;
-
-  const totalAdmins = users.filter((u) =>
-    u.roles?.includes('ROLE_ADMIN')
-  ).length;
+  }, [users, search]);
 
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
-      <div className="lg:w-72 lg:flex-shrink-0">
+      <div className="lg:w-72 lg:flex-shrink-0 lg:self-stretch">
         <AdminSidebar />
       </div>
 
-      <main className="flex-1 p-6 lg:p-8">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <AdminHeader />
 
-        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Gestion des utilisateurs
-            </h1>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <>
+            <div className="mb-8 flex items-center gap-3">
+              <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
+                <Users className="h-7 w-7" />
+              </div>
 
-            <p className="mt-1 text-slate-600">
-              Consultez et gérez tous les utilisateurs inscrits sur la plateforme.
-            </p>
-          </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  Gestion des utilisateurs
+                </h1>
 
-          <button className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:from-violet-700 hover:to-purple-700">
-            <Plus className="h-4 w-4" />
-            Ajouter un utilisateur
-          </button>
-        </div>
+                <p className="mt-1 text-slate-600">
+                  Consultez et gérez les comptes utilisateurs de la plateforme.
+                </p>
+              </div>
+            </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          <AdminStatsCard title="Total utilisateurs" value={totalUsers} icon={Users} />
-          <AdminStatsCard title="Clients" value={totalClients} icon={Users} />
-          <AdminStatsCard title="Administrateurs" value={totalAdmins} icon={Shield} />
-          <AdminStatsCard title="Comptes actifs" value={totalUsers} icon={Shield} />
-        </div>
-
-        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-sm">
+            <div className="mb-6 relative max-w-md">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
 
               <input
@@ -102,25 +77,43 @@ function AdminUsers() {
                 placeholder="Rechercher un utilisateur..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                className="w-full rounded-2xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
               />
             </div>
 
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
-            >
-              <option value="all">Tous les rôles</option>
-              <option value="ROLE_USER">Client</option>
-              <option value="ROLE_ADMIN">Administrateur</option>
-            </select>
-          </div>
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Nom</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Email</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Rôle</th>
+                    </tr>
+                  </thead>
 
-          <div className="mt-6">
-            <AdminUsersTable users={filteredUsers} />
-          </div>
-        </div>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-medium text-slate-900">
+                          {user.prenom} {user.nom}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-700">
+                          {user.email}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-700">
+                          {user.roles?.join(', ')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

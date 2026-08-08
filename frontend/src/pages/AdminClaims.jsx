@@ -7,6 +7,7 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminHeader from '../components/admin/AdminHeader';
 import AdminClaimsToolbar from '../components/admin/AdminClaimsToolbar';
 import AdminClaimsTable from '../components/admin/AdminClaimsTable';
+import PageLoader from '../components/common/PageLoader';
 
 function AdminClaims() {
   const [claims, setClaims] = useState([]);
@@ -21,7 +22,9 @@ function AdminClaims() {
 
         const data = Array.isArray(response.data)
           ? response.data
-          : response.data.claims || response.data['hydra:member'] || [];
+          : response.data.claims ||
+            response.data['hydra:member'] ||
+            [];
 
         setClaims(data);
       } catch (error) {
@@ -36,10 +39,8 @@ function AdminClaims() {
   }, []);
 
   const filteredClaims = useMemo(() => {
-    const safeClaims = Array.isArray(claims) ? claims : [];
-
-    return safeClaims.filter((claim) => {
-      const searchValue = search.toLowerCase();
+    return claims.filter((claim) => {
+      const searchValue = search.toLowerCase().trim();
 
       const matchesSearch =
         claim.description?.toLowerCase().includes(searchValue) ||
@@ -53,47 +54,51 @@ function AdminClaims() {
     });
   }, [claims, search, statusFilter]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
+      {/* Sidebar */}
       <div className="lg:w-72 lg:flex-shrink-0 lg:self-stretch">
         <AdminSidebar />
       </div>
 
+      {/* Contenu principal */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <AdminHeader />
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
-            <TriangleAlert className="h-7 w-7" />
-          </div>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <>
+            {/* En-tête de page */}
+            <div className="mb-8 flex items-center gap-3">
+              <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
+                <TriangleAlert className="h-7 w-7" />
+              </div>
 
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Gestion des sinistres
-            </h1>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">
+                  Gestion des sinistres
+                </h1>
 
-            <p className="mt-1 text-slate-600">
-              Consultez et gérez tous les sinistres déclarés par les clients.
-            </p>
-          </div>
-        </div>
+                <p className="mt-1 text-slate-600">
+                  Consultez et gérez tous les sinistres déclarés par les
+                  clients.
+                </p>
+              </div>
+            </div>
 
-        <AdminClaimsToolbar
-          search={search}
-          setSearch={setSearch}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
+            {/* Recherche et filtres */}
+            <AdminClaimsToolbar
+              search={search}
+              setSearch={setSearch}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+            />
 
-        <AdminClaimsTable claims={filteredClaims} />
+            {/* Tableau */}
+            <AdminClaimsTable claims={filteredClaims} />
+          </>
+        )}
       </main>
     </div>
   );
