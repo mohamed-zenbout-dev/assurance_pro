@@ -10,6 +10,7 @@ import {
   CircleCheck,
 } from 'lucide-react';
 
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import OfferCard from '../components/OfferCard';
@@ -130,12 +131,12 @@ function Home() {
             Rejoignez Assurance Pro et gérez facilement vos contrats, devis et sinistres depuis une plateforme unique.
           </p>
 
-          <a
-            href="/register"
+          <Link
+            to="/register"
             className="mt-8 inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-sm font-semibold text-blue-700 shadow-lg hover:bg-blue-50"
           >
             Commencer maintenant
-          </a>
+          </Link>
         </div>
       </section>
 
