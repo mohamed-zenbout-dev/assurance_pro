@@ -6,7 +6,7 @@ function DashboardHeader({ client }) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
-            Bonjour {client?.firstName || client?.fullName || 'Client'} 👋
+            Bonjour {client?.firstName || client?.fullName || 'Client'} 
           </h1>
           <p className="mt-1 text-slate-600">
             Voici un résumé de vos contrats et sinistres.

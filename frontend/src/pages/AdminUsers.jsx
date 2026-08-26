@@ -19,7 +19,7 @@ function AdminUsers() {
 
         const data = Array.isArray(response.data)
           ? response.data
-          : response.data.users || response.data['hydra:member'] || [];
+          : response.data.data || [];
 
         setUsers(data);
       } catch (error) {
@@ -86,7 +86,6 @@ function AdminUsers() {
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700">Nom</th>
                       <th className="px-4 py-3 text-left font-semibold text-slate-700">Email</th>
                       <th className="px-4 py-3 text-left font-semibold text-slate-700">Rôle</th>
                     </tr>
@@ -94,11 +93,7 @@ function AdminUsers() {
 
                   <tbody className="divide-y divide-slate-100 bg-white">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 font-medium text-slate-900">
-                          {user.prenom} {user.nom}
-                        </td>
-
+                      <tr key={user.id} className="hover:bg-slate-50">                        
                         <td className="px-4 py-3 text-slate-700">
                           {user.email}
                         </td>

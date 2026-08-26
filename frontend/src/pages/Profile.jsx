@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { UserCircle, ShieldCheck, Save } from 'lucide-react';
+import { Save, ShieldCheck, UserCircle } from 'lucide-react';
 
 import api from '../services/api';
 
@@ -12,36 +12,48 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
   const [form, setForm] = useState({
     nom: '',
     prenom: '',
     email: '',
     telephone: '',
     adresse: '',
+    password: '',
   });
 
   useEffect(() => {
-    const fetchClient = async () => {
+    const fetchProfile = async () => {
       try {
-        const response = await api.get('/client/1');
+        const [clientResponse, userResponse] = await Promise.all([
+          api.get('/client'),
+          api.get('/me'),
+        ]);
 
-        setClient(response.data);
+  
+        const currentClient = clientResponse.data.data?.[0] || null;
+        
+        setClient(currentClient);
 
         setForm({
-          nom: response.data.nom || '',
-          prenom: response.data.prenom || '',
-          email: response.data.email || '',
-          telephone: response.data.telephone || '',
-          adresse: response.data.adresse || '',
+          nom: currentClient?.nom || '',
+          prenom: currentClient?.prenom || '',
+          email: userResponse.data.email || '',
+          telephone: currentClient?.telephone || '',
+          adresse: currentClient?.adresse || '',
+          password: '',
         });
       } catch (error) {
         console.error('Erreur chargement profil :', error);
+        setErrorMessage('Impossible de charger le profil');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchClient();
+    fetchProfile();
   }, []);
 
   const handleChange = (e) => {
@@ -55,17 +67,40 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      if (!client) {
+        setErrorMessage('Client introuvable');
+        return;
+      }
+
     setSaving(true);
+    setMessage('');
+    setErrorMessage('');
 
     try {
-      const response = await api.put('/client/1', form);
+      // Mise à jour des informations client
+      const clientResponse = await api.put(`/client/${client.id}`, {
+        name: `${form.prenom} ${form.nom}`.trim(),
+        telephone: form.telephone,
+        adresse: form.adresse,
+      });
 
-      setClient(response.data);
+      // Mise à jour de l'utilisateur connecté
+      await api.put('/me', {
+        email: form.email,
+        password: form.password || undefined,
+      });
 
-      alert('Profil mis à jour avec succès');
+      setClient(clientResponse.data);
+
+      setForm((prev) => ({
+        ...prev,
+        password: '',
+      }));
+
+      setMessage('Profil mis à jour avec succès');
     } catch (error) {
-      console.error('Erreur mise à jour profil :', error);
-      alert('Impossible de mettre à jour le profil');
+      console.error(error.response?.data);
+      setErrorMessage('Impossible de mettre à jour le profil');
     } finally {
       setSaving(false);
     }
@@ -73,10 +108,12 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-slate-100 lg:flex">
-      <div className="lg:w-72 lg:flex-shrink-0 lg:self-stretch">
+      {/* Sidebar */}
+      <div className="lg:w-72 lg:flex-shrink-0">
         <DashboardSidebar />
       </div>
 
+      {/* Contenu principal */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8">
         <DashboardHeader client={client} />
 
@@ -84,6 +121,7 @@ function Profile() {
           <PageLoader />
         ) : (
           <>
+            {/* En-tête de page */}
             <div className="mb-8 flex items-center gap-3">
               <div className="rounded-2xl bg-violet-100 p-3 text-violet-600">
                 <UserCircle className="h-7 w-7" />
@@ -100,13 +138,29 @@ function Profile() {
               </div>
             </div>
 
+            {/* Message de succès */}
+            {message && (
+              <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                {message}
+              </div>
+            )}
+
+            {/* Message d'erreur */}
+            {errorMessage && (
+              <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {errorMessage}
+              </div>
+            )}
+
             <div className="grid gap-6 xl:grid-cols-3">
+              {/* Formulaire */}
               <div className="xl:col-span-2">
                 <form
                   onSubmit={handleSubmit}
                   className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
                 >
                   <div className="grid gap-5 sm:grid-cols-2">
+                    {/* Nom */}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Nom
@@ -121,6 +175,7 @@ function Profile() {
                       />
                     </div>
 
+                    {/* Prénom */}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Prénom
@@ -135,6 +190,7 @@ function Profile() {
                       />
                     </div>
 
+                    {/* Email */}
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Email
@@ -149,6 +205,7 @@ function Profile() {
                       />
                     </div>
 
+                    {/* Téléphone */}
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Téléphone
@@ -163,6 +220,7 @@ function Profile() {
                       />
                     </div>
 
+                    {/* Adresse */}
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Adresse
@@ -176,8 +234,25 @@ function Profile() {
                         className="w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
                       />
                     </div>
+
+                    {/* Mot de passe */}
+                    <div className="sm:col-span-2">
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Nouveau mot de passe
+                      </label>
+
+                      <input
+                        type="password"
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        placeholder="Laisser vide pour conserver le mot de passe actuel"
+                        className="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      />
+                    </div>
                   </div>
 
+                  {/* Bouton de sauvegarde */}
                   <div className="mt-6 flex justify-end">
                     <button
                       type="submit"
@@ -185,12 +260,16 @@ function Profile() {
                       className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/25 transition hover:from-violet-700 hover:to-purple-700 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       <Save className="h-4 w-4" />
-                      {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+
+                      {saving
+                        ? 'Enregistrement...'
+                        : 'Enregistrer les modifications'}
                     </button>
                   </div>
                 </form>
               </div>
 
+              {/* Carte profil */}
               <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex flex-col items-center text-center">
                   <div className="rounded-full bg-violet-100 p-5 text-violet-600">
@@ -198,11 +277,11 @@ function Profile() {
                   </div>
 
                   <h3 className="mt-4 text-xl font-bold text-slate-900">
-                    {client?.prenom} {client?.nom}
+                    {form.prenom} {form.nom}
                   </h3>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    {client?.email}
+                    {form.email}
                   </p>
 
                   <div className="mt-6 flex items-center gap-2 rounded-full bg-green-100 px-3 py-2 text-sm font-medium text-green-700">

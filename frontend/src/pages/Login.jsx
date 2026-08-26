@@ -128,7 +128,6 @@ function Login() {
 
                 <input
                   type="email"
-                  placeholder="test2@test.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -148,7 +147,6 @@ function Login() {
 
                 <input
                   type="password"
-                  placeholder="123456"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -204,7 +202,7 @@ function Login() {
               to="/register"
               className="font-semibold text-violet-600 transition hover:text-violet-700"
             >
-              S’inscrire
+              S'inscrire
             </Link>
           </p>
         </div>

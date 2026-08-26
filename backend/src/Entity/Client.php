@@ -19,13 +19,13 @@ class Client
     #[ORM\GeneratedValue]
     // Identifiant unique du client.
     #[ORM\Column]
-    #[Groups(['client:read'])]
+    #[Groups(['client:read' , 'claim:read'])]
     private ?int $id = null;
 
 
     // Nom complet du client.
     #[ORM\Column(length: 255)]
-    #[Groups(['client:read'])]
+    #[Groups(['client:read' , 'claim:read'])]
     private ?string $name = null;
 
     // Utilisateur responsable de ce client.
@@ -100,6 +100,7 @@ class Client
         return $this->contracts;
     }
 
+    // Associe un contrat au client.
     public function addContract(Contract $contract): static
     {
         if (!$this->contracts->contains($contract)) {
@@ -109,7 +110,7 @@ class Client
 
         return $this;
     }
-
+    // Supprime un contrat du client.
     public function removeContract(Contract $contract): static
     {
         if ($this->contracts->removeElement($contract)) {

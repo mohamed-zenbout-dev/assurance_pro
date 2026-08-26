@@ -74,15 +74,10 @@ final class ClaimController extends AbstractController
             'page'  => $page,
             'limit' => $limit,
             'total' => (int) $total,
-            'ids' => array_map(
-            fn($claim) => $claim->getId(),
-            $claims
-            )
+            'data'  => $claims
+        ], 200, [], [
+            'groups' => 'claim:read'
         ]);
-        //     'data'  => $claims
-        // ], 200, [], [
-        //     'groups' => 'claim:read'
-        // ]);
     }
 
     #[Route('/api/claims/{id}', name: 'claim_show', methods: ['GET'])]
