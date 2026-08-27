@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Mail, Lock, ShieldCheck, Globe, Share2 } from 'lucide-react';
+import { Mail, Lock, ShieldCheck} from 'lucide-react';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -88,7 +88,7 @@ function LoginForm() {
 
             <input
               type="email"
-              placeholder="exemple@email.com"
+              placeholder="Entrez votre adresse email :"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -107,7 +107,7 @@ function LoginForm() {
 
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="Entrez votre mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -125,36 +125,6 @@ function LoginForm() {
         </button>
       </form>
 
-      {/* Séparateur */}
-      <div className="my-6 flex items-center gap-4">
-        <div className="h-px flex-1 bg-slate-200" />
-        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
-          Ou
-        </span>
-        <div className="h-px flex-1 bg-slate-200" />
-      </div>
-
-      {/* Réseaux */}
-      <div className="text-center">
-        <p className="text-sm text-slate-500">Continuez avec</p>
-
-        <div className="mt-4 flex justify-center gap-3">
-          <button
-            type="button"
-            className="rounded-full border border-slate-200 p-3 text-slate-500 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-          >
-            <Globe className="h-5 w-5" />
-          </button>
-
-          <button
-            type="button"
-            className="rounded-full border border-slate-200 p-3 text-slate-500 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-          >
-            <Share2 className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
       {/* Inscription */}
       <p className="mt-8 text-center text-sm text-slate-500">
         Pas encore de compte ?{' '}
@@ -162,7 +132,7 @@ function LoginForm() {
           to="/register"
           className="font-semibold text-violet-600 transition hover:text-violet-700"
         >
-          S’inscrire
+          S'inscrire
         </Link>
       </p>
     </div>

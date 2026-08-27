@@ -6,13 +6,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-import {
-  ShieldCheck,
-  Mail,
-  Lock,
-  Globe,
-  Share2,
-} from 'lucide-react';
+import {ShieldCheck, Mail, Lock} from 'lucide-react';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -164,36 +158,6 @@ function Login() {
               {loading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
-
-          {/* Séparateur */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px flex-1 bg-slate-200" />
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              OU
-            </span>
-            <div className="h-px flex-1 bg-slate-200" />
-          </div>
-
-          {/* Réseaux */}
-          <div className="text-center">
-            <p className="text-sm text-slate-500">Continuez avec</p>
-
-            <div className="mt-4 flex justify-center gap-3">
-              <button
-                type="button"
-                className="rounded-full border border-slate-200 p-3 text-slate-500 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-              >
-                <Globe className="h-5 w-5" />
-              </button>
-
-              <button
-                type="button"
-                className="rounded-full border border-slate-200 p-3 text-slate-500 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
 
           {/* Inscription */}
           <p className="mt-8 text-center text-sm text-slate-500">

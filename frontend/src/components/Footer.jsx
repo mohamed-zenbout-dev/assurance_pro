@@ -1,4 +1,4 @@
-import { Mail, Phone, Globe, Share2 } from 'lucide-react';
+import { Mail, Phone} from 'lucide-react';
 
 function Footer() {
   return (
@@ -19,44 +19,7 @@ function Footer() {
               <span>+33 6 00 00 00 00</span>
             </div>
           </div>
-        </div>
-
-        {/* Informations */}
-        <div>
-          <h3 className="text-lg font-semibold text-white">Informations</h3>
-
-          <div className="mt-4 flex flex-col gap-2 text-sm">
-            <a href="#" className="hover:text-white">
-              Mentions légales
-            </a>
-            <a href="#" className="hover:text-white">
-              FAQ
-            </a>
-          </div>
-        </div>
-
-        {/* Réseaux */}
-        <div>
-          <h3 className="text-lg font-semibold text-white">Suivez-nous</h3>
-
-          <div className="mt-4 flex gap-4">
-            <a
-              href="#"
-              className="rounded-full bg-slate-800 p-3 transition hover:bg-blue-600 hover:text-white"
-              aria-label="Site web"
-            >
-              <Globe className="h-5 w-5" />
-            </a>
-
-            <a
-              href="#"
-              className="rounded-full bg-slate-800 p-3 transition hover:bg-blue-600 hover:text-white"
-              aria-label="Réseaux sociaux"
-            >
-              <Share2 className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
+        </div>       
       </div>
 
       <div className="mx-auto mt-10 max-w-7xl border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
