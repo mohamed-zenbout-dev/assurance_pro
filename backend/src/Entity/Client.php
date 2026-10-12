@@ -28,6 +28,14 @@ class Client
     #[Groups(['client:read' , 'claim:read'])]
     private ?string $name = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['client:read'])]
+    private ?string $telephone = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['client:read'])]
+    private ?string $adresse = null;
+
     // Utilisateur responsable de ce client.
     //  Relation ManyToOne : plusieurs clients peuvent appartenir au même utilisateur.
     #[ORM\ManyToOne(inversedBy: 'clients')]
@@ -76,6 +84,30 @@ class Client
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(?string $telephone): static
+    {
+        $this->telephone = $telephone;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): static
+    {
+        $this->adresse = $adresse;
 
         return $this;
     }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
+import api from '../services/api';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -23,21 +23,12 @@ function Login() {
     setLoading(true);
     setError('');
 
-    console.log('Connexion avec :', email, password);
-
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/login_check',
-        {
-          email: email.trim(),
-          password: password.trim(),
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await api.post('/login_check', {
+        email: email.trim(),
+        password: password.trim(),
+      });
+
 
       console.log('Réponse login :', response.data);
 

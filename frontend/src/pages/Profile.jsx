@@ -27,12 +27,16 @@ function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const [clientResponse, userResponse] = await Promise.all([
-          api.get('/client'),
-          api.get('/me'),
-        ]);
+        console.log('Début GET /client');
 
-  
+        const clientResponse = await api.get('/client');
+
+        console.log('Réponse /client :', clientResponse.data);
+
+        const userResponse = await api.get('/me');
+
+        console.log('Réponse /me :', userResponse.data);
+
         const currentClient = clientResponse.data.data?.[0] || null;
         
         setClient(currentClient);

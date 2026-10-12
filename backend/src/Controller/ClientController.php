@@ -127,6 +127,8 @@ final class ClientController extends AbstractController
 
         $client = new Client();
         $client->setName($dto->name);
+        $client->setTelephone($data['telephone'] ?? null);
+        $client->setAdresse($data['adresse'] ?? null);
         $client->setOwner($this->getUser());
 
         $em->persist($client);
@@ -154,6 +156,14 @@ final class ClientController extends AbstractController
         $dto->name = $data['name'] ?? null;
         if (isset($data['name'])) {
             $client->setName($data['name']);
+        }
+
+        if (isset($data['telephone'])) {
+            $client->setTelephone($data['telephone']);
+        }
+
+        if (isset($data['adresse'])) {
+            $client->setAdresse($data['adresse']);
         }
 
         // VALIDATION

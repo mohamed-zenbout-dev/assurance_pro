@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { Mail, Lock, ShieldCheck} from 'lucide-react';
 
 function LoginForm() {
@@ -18,18 +18,10 @@ function LoginForm() {
     setError('');
 
     try {
-      const response = await axios.post(
-        'http://localhost:8000/api/login_check',
-        {
-          email: email.trim(),
-          password: password.trim(),
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await api.post('/login_check', {
+        email: email.trim(),
+        password: password.trim(),
+      });
 
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -30,7 +30,7 @@ function Register() {
 
   const navigate = useNavigate();
 
-  // ✅ INSCRIPTION AVEC API SYMFONY
+  // INSCRIPTION AVEC API SYMFONY
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,20 +51,12 @@ function Register() {
     setLoading(true);
 
     try {
-      // ⚠️ Adapte les champs selon ton RegisterController Symfony
-      const response = await axios.post(
-        'http://localhost:8000/api/register',
-        {
-          email: email.trim(),
-          password: password.trim(),
-          fullName: fullName.trim(),
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // Adapte les champs selon ton RegisterController Symfony
+      const response = await api.post('/register', {
+        email: email.trim(),
+        password: password.trim(),
+        fullName: fullName.trim(),
+      });
 
       console.log('Inscription réussie :', response.data);
 

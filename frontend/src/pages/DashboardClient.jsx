@@ -16,10 +16,14 @@ function DashboardClient() {
     const fetchDashboard = async () => {
       try {
         const [clientRes, contractsRes, claimsRes] = await Promise.all([
-          api.get('/client/1'),
+          api.get('/client'),
           api.get('/contracts'),
           api.get('/claims'),
         ]);
+        console.log('CLIENT RESPONSE:', clientRes.data);
+        console.log('CONTRACTS RESPONSE:', contractsRes.data);
+        console.log('CLAIMS RESPONSE:', claimsRes.data);
+
 
         setClient(clientRes.data);
         setContracts(contractsRes.data || []);
